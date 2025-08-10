@@ -126,16 +126,24 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  .bg-gradient-primary {
-    background-image: var(--gradient-primary);
+  .bg-gradient-primary { background-image: var(--gradient-primary); }
+  .bg-gradient-surface { background-image: var(--gradient-surface); }
+  .shadow-elevated { box-shadow: var(--shadow-elevated); }
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+
+  /* Interactive Utilities */
+  .story-link {
+    position: relative; display: inline-block;
   }
-  .bg-gradient-surface {
-    background-image: var(--gradient-surface);
-  }
-  .shadow-elevated {
-    box-shadow: var(--shadow-elevated);
-  }
-  .shadow-soft {
-    box-shadow: var(--shadow-soft);
-  }
+  .story-link::after {
+    content: ""; position: absolute; left: 0; bottom: 0; height: 2px; width: 100%;
+    background-color: hsl(var(--primary)); transform: scaleX(0); transform-origin: bottom right;
+    transition: transform 300ms;}
+  .story-link:hover::after { transform: scaleX(1); transform-origin: bottom left; }
+
+  .hover-scale { transition: transform 200ms; }
+  .hover-scale:hover { transform: scale(1.05); }
+
+  .pulse { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
 }
+

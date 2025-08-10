@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
+const BOT_NAME = "Jerry";
+
 type Message = {
   id: string;
   role: "user" | "bot";
@@ -18,32 +20,38 @@ function generateId() {
 function getRuleBasedResponse(inputRaw: string): string {
   const input = inputRaw.trim().toLowerCase();
 
-  // Empty
   if (!input) return "Please type something. Try 'help' to see what I can do.";
-
-  // Clear handled outside
 
   // Greetings
   if (/^(hi|hello|hey)\b/.test(input)) {
-    return "Hello! I'm a rule-based bot. Ask me about time, date, math like 'sum 12 and 30', or type 'help'.";
+    return `Hello! I'm ${BOT_NAME}. Ask me about time, date, math like 'sum 12 and 30', weather stubs, jokes, quotes, conversions, and more. Type 'help'.`;
   }
 
-  // How are you
   if (/how are (you|u)/.test(input)) {
     return "Doing great and ready to help!";
   }
 
-  // Time
+  // Time & Date
   if (/\btime\b/.test(input)) {
     return `Current time: ${new Date().toLocaleTimeString()}`;
   }
-
-  // Date
-  if (/\bdate\b/.test(input)) {
+  if (/\bdate\b/.test(input) || /what( is|'s) the date/.test(input)) {
     return `Today's date: ${new Date().toLocaleDateString()}`;
   }
+  if (/\bweekday\b|what day is it/.test(input)) {
+    return new Date().toLocaleDateString(undefined, { weekday: 'long' });
+  }
 
-  // Sum or add
+  // Weather (stub)
+  const weatherMatch = input.match(/weather in ([a-z\s]+)/);
+  if (weatherMatch) {
+    const city = weatherMatch[1].trim().replace(/\b\w/g, (m) => m.toUpperCase());
+    const moods = ["sunny", "cloudy", "breezy", "rainy", "cozy"];
+    const mood = moods[Math.floor(Math.random() * moods.length)];
+    return `I can't fetch live weather yet, but ${city} feels ${mood} today. Carry an umbrella just in case ☔.`;
+  }
+
+  // Math
   const sumMatch = input.match(/(?:sum|add)\s+(\-?\d+(?:\.\d+)?)\s+(?:and|\+|with)\s+(\-?\d+(?:\.\d+)?)/);
   if (sumMatch) {
     const a = parseFloat(sumMatch[1]);
@@ -51,7 +59,6 @@ function getRuleBasedResponse(inputRaw: string): string {
     return `${a} + ${b} = ${a + b}`;
   }
 
-  // Basic calc e.g., 12 + 3
   const arithmetic = input.match(/(-?\d+(?:\.\d+)?)\s*([+\-*\/])\s*(-?\d+(?:\.\d+)?)/);
   if (arithmetic) {
     const a = parseFloat(arithmetic[1]);
@@ -61,21 +68,75 @@ function getRuleBasedResponse(inputRaw: string): string {
     return `${a} ${op} ${b} = ${Number.isNaN(result) ? "undefined" : result}`;
   }
 
-  // Weather (stub)
-  const weatherMatch = input.match(/weather in ([a-z\s]+)/);
-  if (weatherMatch) {
-    const city = weatherMatch[1].trim().replace(/\b\w/g, (m) => m.toUpperCase());
-    return `I can't fetch live weather yet, but ${city} usually feels nicer with an umbrella just in case ☔.`;
+  // Conversions
+  const cToF = input.match(/(-?\d+(?:\.\d+)?)\s?(?:c|celsius)\s*(?:to|in)\s*(?:f|fahrenheit)/);
+  if (cToF) {
+    const c = parseFloat(cToF[1]);
+    const f = (c * 9) / 5 + 32;
+    return `${c}°C = ${f.toFixed(2)}°F`;
+  }
+  const fToC = input.match(/(-?\d+(?:\.\d+)?)\s?(?:f|fahrenheit)\s*(?:to|in)\s*(?:c|celsius)/);
+  if (fToC) {
+    const f = parseFloat(fToC[1]);
+    const c = ((f - 32) * 5) / 9;
+    return `${f}°F = ${c.toFixed(2)}°C`;
   }
 
+  // Date math: days until YYYY-MM-DD
+  const until = input.match(/days? until (\d{4}-\d{2}-\d{2})/);
+  if (until) {
+    const target = new Date(until[1]);
+    const now = new Date();
+    const diff = Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return diff >= 0 ? `${diff} day(s) until ${target.toDateString()}` : `That date has passed (${target.toDateString()}).`;
+  }
+
+  // Weekday for a given date
+  const weekdayFor = input.match(/weekday for (\d{4}-\d{2}-\d{2})/);
+  if (weekdayFor) {
+    const d = new Date(weekdayFor[1]);
+    return d.toLocaleDateString(undefined, { weekday: 'long' });
+  }
+
+  // Fun
+  if (/joke/.test(input)) {
+    const jokes = [
+      "Why do programmers prefer dark mode? Because light attracts bugs!",
+      "I told my computer I needed a break, and it said 'No problem—I'll go to sleep.'",
+      "There are 10 kinds of people: those who understand binary and those who don't."
+    ];
+    return jokes[Math.floor(Math.random() * jokes.length)];
+  }
+  if (/quote/.test(input)) {
+    const quotes = [
+      '“Simplicity is the soul of efficiency.” — Austin Freeman',
+      '“Code is like humor. When you have to explain it, it’s bad.” — Cory House',
+      '“Make it work, make it right, make it fast.” — Kent Beck'
+    ];
+    return quotes[Math.floor(Math.random() * quotes.length)];
+  }
+
+  // Text transforms
+  const rev = input.match(/reverse (.+)/);
+  if (rev) return rev[1].split("").reverse().join("");
+  const up = input.match(/uppercase (.+)/);
+  if (up) return up[1].toUpperCase();
+  const low = input.match(/lowercase (.+)/);
+  if (low) return low[1].toLowerCase();
+
+  // Help
   if (/help|what can you do|commands?/.test(input)) {
     return [
-      "Here are some things you can try:",
-      "• 'hi' — greeting",
-      "• 'time' or 'date' — show current time/date",
-      "• 'sum 41 and 1' or '12 + 3' — quick math",
-      "• 'weather in Tokyo' — playful stub",
-      "• 'clear' — reset the chat",
+      `Hi, I'm ${BOT_NAME}! Try these:`,
+      "• hi — greeting",
+      "• time, date, weekday",
+      "• weather in Tokyo — playful stub",
+      "• sum 41 and 1 | 12 + 3 — quick math",
+      "• 30 c to f | 86 f to c — conversions",
+      "• days until 2025-01-01 | weekday for 2025-01-01",
+      "• joke | quote",
+      "• reverse hello | uppercase hi | lowercase BYE",
+      "• clear — reset the chat",
     ].join("\n");
   }
 
@@ -83,7 +144,6 @@ function getRuleBasedResponse(inputRaw: string): string {
     return "Goodbye! Have a great day 👋";
   }
 
-  // Fallback
   return "I didn't catch that. Type 'help' to see supported commands.";
 }
 
@@ -125,7 +185,7 @@ const RuleBot: React.FC = () => {
   useEffect(() => {
     if (messages.length === 0) {
       setMessages([
-        { id: generateId(), role: "bot", ts: Date.now(), text: "Hey! I'm a tiny rule-based chatbot. Type 'help' to see examples." },
+        { id: generateId(), role: "bot", ts: Date.now(), text: `Hey! I'm ${BOT_NAME}, a playful rule‑based chatbot. Type 'help' to see examples.` },
       ]);
     }
   }, []);
@@ -169,7 +229,7 @@ const RuleBot: React.FC = () => {
   return (
     <Card className="shadow-soft border backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <CardHeader>
-        <CardTitle className="text-xl">Rule-based Chatbot</CardTitle>
+        <CardTitle className="text-xl">Jerry — Rule‑based Chatbot</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="h-[320px] overflow-y-auto pr-1">{rendered}</div>

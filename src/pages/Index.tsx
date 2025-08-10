@@ -35,25 +35,25 @@ const Index = () => {
     <div className="relative min-h-screen bg-gradient-surface">
       <BrandBackground />
       <header className="container flex items-center justify-between py-6">
-        <a href="#home" className="font-semibold tracking-tight">Web Weaver</a>
+        <a href="#home" className="font-semibold tracking-tight bg-gradient-primary bg-clip-text text-transparent">Web Weaver</a>
         <nav className="hidden md:flex items-center gap-3 text-sm text-muted-foreground">
-          <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-          <a href="#chat" className="hover:text-foreground transition-colors">Try Demo</a>
+          <a href="#features" className="story-link">Features</a>
+          <a href="#chat" className="story-link">Try Demo</a>
         </nav>
       </header>
 
       <main id="home" className="container">
         <section className="grid md:grid-cols-2 gap-10 items-center py-10 md:py-16">
           <article>
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4 animate-enter">
               Rule‑Based Chatbot
             </h1>
-            <p className="text-lg text-muted-foreground mb-6 max-w-prose">
+            <p className="text-lg text-muted-foreground mb-6 max-w-prose animate-fade-in">
               Build intuition for natural language flows with a fast, privacy‑friendly bot that answers using predefined rules and pattern matching.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
-              <a href="#chat"><Button variant="hero" className="px-6">Start chatting</Button></a>
-              <a href="#features"><Button variant="outline">How it works</Button></a>
+              <a href="#chat"><Button variant="hero" className="px-6 hover-scale">Start chatting</Button></a>
+              <a href="#features"><Button variant="outline" className="hover-scale">How it works</Button></a>
             </div>
           </article>
           <aside className="relative">
@@ -66,15 +66,15 @@ const Index = () => {
 
         <section id="features" className="py-8 md:py-12">
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="rounded-lg border p-5 bg-card shadow-soft">
+            <div className="rounded-lg border p-5 bg-card shadow-soft animate-fade-in">
               <h3 className="font-semibold mb-2">Pattern Matching</h3>
               <p className="text-sm text-muted-foreground">Understands greetings, time/date, quick math and more.</p>
             </div>
-            <div className="rounded-lg border p-5 bg-card shadow-soft">
+            <div className="rounded-lg border p-5 bg-card shadow-soft animate-fade-in" >
               <h3 className="font-semibold mb-2">Fast & Private</h3>
               <p className="text-sm text-muted-foreground">All logic runs in your browser—no data leaves the page.</p>
             </div>
-            <div className="rounded-lg border p-5 bg-card shadow-soft">
+            <div className="rounded-lg border p-5 bg-card shadow-soft animate-fade-in">
               <h3 className="font-semibold mb-2">Extensible</h3>
               <p className="text-sm text-muted-foreground">Add new rules easily for your use‑case.</p>
             </div>
